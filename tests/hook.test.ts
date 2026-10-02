@@ -224,6 +224,15 @@ describe('getConnection', () => {
     ).toEqual({ apiKey: 'kjev_y', baseUrl: 'https://gw.example/alpha/decisions' });
   });
 
+  it('skips empty variables and uses the next source', async () => {
+    expect(
+      await getConnection(
+        fakeHost({ TYPESAFE_API_KEY: '', TYPESAFE_BASE_URL: '' }, { TYPESAFE_API_KEY: 'sk-or-2' }),
+        resolveHookConfig({}),
+      ),
+    ).toEqual({ apiKey: 'sk-or-2', baseUrl: OPENROUTER_SYSTEM_ONE_URL });
+  });
+
   it('prefers the apiKey option and leaves the endpoint at its default', async () => {
     expect(
       await getConnection(fakeHost({ TYPESAFE_API_KEY: 'env' }), resolveHookConfig({ apiKey: 'opt' })),

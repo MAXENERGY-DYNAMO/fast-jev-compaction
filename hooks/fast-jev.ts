@@ -264,16 +264,18 @@ export async function getConnection(
   config: HookConfig,
 ): Promise<{ apiKey?: string; baseUrl?: string }> {
   const env = await settingsEnv($);
+  // `||`, not `??`: an empty variable falls through to the next source.
   const apiKey =
-    config.apiKey ??
-    (await $.env.get('TYPESAFE_API_KEY')) ??
-    stringValue(env['TYPESAFE_API_KEY']) ??
-    (await $.env.get('OPENROUTER_API_KEY')) ??
-    stringValue(env['OPENROUTER_API_KEY']);
+    config.apiKey ||
+    (await $.env.get('TYPESAFE_API_KEY')) ||
+    stringValue(env['TYPESAFE_API_KEY']) ||
+    (await $.env.get('OPENROUTER_API_KEY')) ||
+    stringValue(env['OPENROUTER_API_KEY']) ||
+    undefined;
   const baseUrl = resolveSystemOneUrl({
-    jevBaseUrl: (await $.env.get('JEV_BASE_URL')) ?? stringValue(env['JEV_BASE_URL']),
+    jevBaseUrl: (await $.env.get('JEV_BASE_URL')) || stringValue(env['JEV_BASE_URL']),
     typesafeBaseUrl:
-      (await $.env.get('TYPESAFE_BASE_URL')) ?? stringValue(env['TYPESAFE_BASE_URL']),
+      (await $.env.get('TYPESAFE_BASE_URL')) || stringValue(env['TYPESAFE_BASE_URL']),
     apiKey,
   });
   const connection: { apiKey?: string; baseUrl?: string } = {};
